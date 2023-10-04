@@ -73,8 +73,8 @@ def chain_query_from_file():
 def simple_query_from_youtube():
     url="https://www.youtube.com/watch?v=KjOUQBzl2Ug&list=PLc53cT1vE-OLHeGIFHwLvMqNqRm4BH6Jw"
     language_code="it"
-    local_file=save_remote_file(
-        url=url,
+    local_file=save_file(
+        location=url,
         language_code=language_code
     )
     
@@ -162,16 +162,20 @@ def chain_query_from_texts():
     response=chain.invoke(query)
     print(response)
 
-def multiple_files():
-    urls = [
-        "https://sds-platform-private.s3-us-east-2.amazonaws.com/uploads/PT719-Transcript.pdf", 
-        "https://sds-platform-private.s3-us-east-2.amazonaws.com/uploads/PT717-Transcript.pdf",
-        "https://sds-platform-private.s3-us-east-2.amazonaws.com/uploads/PT715-Transcript.pdf",
-        "https://sds-platform-private.s3-us-east-2.amazonaws.com/uploads/PT713-Transcript.pdf"
+def multiple_files(language_code='en'):
+    locations = [
+        "https://www.youtube.com/watch?v=8o9y8HGgqjw&list=PLc53cT1vE-OLOLNrOQiFbbSwHybkQov3L&index=1", 
+        "https://www.youtube.com/watch?v=5olNe6ZlKB8&list=PLc53cT1vE-OLOLNrOQiFbbSwHybkQov3L&index=2",
+        "https://www.youtube.com/watch?v=Kf6uz9UO-vA&list=PLc53cT1vE-OLOLNrOQiFbbSwHybkQov3L&index=3",
+        "./files/DHCP online - v1.0.pdf",
+        "./files/DHCP v2.0.pdf",
+        "./files/dhcp.txt"
     ]
     downloaded_files = []
-    for url in urls:
-        local_file = save_remote_file(url)
+    for location in locations:
+        local_file = save_file(
+            location,
+            language_code=language_code)
         downloaded_files.append(local_file)
     
     persist_directory = 'chroma'
@@ -201,10 +205,14 @@ def multiple_files():
         | StrOutputParser()
     )
 
-    query = "What is ToolFormer?"
-    response=chain.invoke(query)
-    print(response)
-
+    try:
+        print("\n***WELCOME***\n")
+        while True:
+            query = input("\nUser: ")
+            response=chain.invoke(query)
+            print(f"Assistant: {response}")
+    except KeyboardInterrupt:
+        print("BYE BYE!!!")
 
 load_dotenv()
 
@@ -213,4 +221,4 @@ load_dotenv()
 #chain_query_from_texts()
 #local_file=save_remote_file("https://www.gutenberg.org/cache/epub/1934/pg1934.txt")
 #simple_query_from_youtube()
-# multiple_files()
+multiple_files(language_code='it')

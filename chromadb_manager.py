@@ -134,14 +134,14 @@ def load_vectordb(persist_directory,embedding):
     else:
         raise ValueError(f"VectorDB does not exist in {persist_directory}")
 
-def save_remote_file(url,language_code="en"):
+def save_file(location,language_code="en"):
     #https://sds-platform-private.s3-us-east-2.amazonaws.com/uploads/PT717-Transcript.pdf
     #https://www.gutenberg.org/cache/epub/1934/pg1934.txt
     save_directory="./files"
-    parsed = urlparse(url)
+    parsed = urlparse(location)
     if "youtube.com" in parsed.netloc or "youtu.be" in parsed.netloc:
-        transcript_content = get_youtube_transcript(url,language_code=language_code)
-        video_id = extract_youtube_id(url)
+        transcript_content = get_youtube_transcript(location,language_code=language_code)
+        video_id = extract_youtube_id(location)
         if video_id:
             local_filename = os.path.join(save_directory, f"{video_id}.txt")
         else:
@@ -151,19 +151,19 @@ def save_remote_file(url,language_code="en"):
             f.write(transcript_content)
         return local_filename
     elif bool(parsed.netloc):
-        local_filename = os.path.join(save_directory, os.path.basename(url))
+        local_filename = os.path.join(save_directory, os.path.basename(location))
 
         if not os.path.exists(local_filename) or overwrite:
-            with requests.get(url, stream=True) as r:
+            with requests.get(location, stream=True) as r:
                 r.raise_for_status()
                 with open(local_filename, 'wb') as f:
                     for chunk in r.iter_content(chunk_size=8192):
                         f.write(chunk)
     else:
-        if os.path.exists(url):
-            local_filename=url
+        if os.path.exists(location):
+            local_filename=location
         else:
-            raise FileNotFoundError(f"File '{file_source}' not foubd.")
+            raise FileNotFoundError(f"File '{location}' not found.")
     
     return local_filename
 
