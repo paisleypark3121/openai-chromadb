@@ -6,7 +6,10 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.llms import OpenAI
-from langchain.chains import RetrievalQA
+from langchain.chains import (
+    RetrievalQA,
+    ConversationalRetrievalChain
+)
 from langchain.document_loaders import (
     TextLoader,
     YoutubeLoader
@@ -172,5 +175,13 @@ def do_query(vectordb,llm,query):
         llm=llm, 
         chain_type="stuff", 
         retriever=vectordb.as_retriever()
+    )    
+    return qa.run(query)
+
+def do_query(vectordb,llm,memory,query):
+    qa = ConversationalRetrievalChain.from_llm(
+        llm=llm, 
+        retriever=vectordb.as_retriever(),
+        memory=memory
     )    
     return qa.run(query)
